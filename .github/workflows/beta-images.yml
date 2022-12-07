@@ -38,7 +38,7 @@ jobs:
             --build-arg OS_NAME="alpine" \
             --build-arg OS_VERSION="3.16" \
             --build-arg HUGO_VERSION="${HUGO_VERSION}" \
-            -f Dockerifle \
+            -f Dockerfile \
             -t truemark/hugo:beta-alpine-3.16 \
             .
   alpine-317:
@@ -72,7 +72,7 @@ jobs:
             --build-arg OS_NAME="alpine" \
             --build-arg OS_VERSION="3.17" \
             --build-arg HUGO_VERSION="${HUGO_VERSION}" \
-            -f Dockerifle \
+            -f Dockerfile \
             -t truemark/hugo:beta-alpine-3.17 \
             .
   ubuntu-focal:
