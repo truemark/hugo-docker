@@ -15,4 +15,4 @@ RUN curl -sSL https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION
 
 FROM $OS_NAME:$OS_VERSION
 COPY --from=build /usr/local/bin/hugo /usr/local/bin/hugo
-ENTRYPOINT /usr/local/bin/hugo
+ENTRYPOINT ["hugo"]
