@@ -42,6 +42,7 @@ jobs:
             --build-arg OS_VERSION="3.16" \
             --build-arg HUGO_VERSION="${HUGO_VERSION}" \
             -f Dockerfile \
+            -t truemark/hugo:${HUGO_VERSION}-alpine-3.16 \
             -t truemark/hugo:alpine-3.16 \
             .
   alpine-317:
@@ -76,7 +77,10 @@ jobs:
             --build-arg OS_VERSION="3.17" \
             --build-arg HUGO_VERSION="${HUGO_VERSION}" \
             -f Dockerfile \
+            -t truemark/hugo:${HUGO_VERSION}-alpine-3.17 \
             -t truemark/hugo:alpine-3.17 \
+            -t truemark/hugo:alpine \
+            -t truemark/hugo:latest \
             .
   ubuntu-focal:
     runs-on: ubuntu-latest
@@ -110,6 +114,7 @@ jobs:
             --build-arg OS_VERSION="focal" \
             --build-arg HUGO_VERSION="${HUGO_VERSION}" \
             -f Dockerfile \
+            -t truemark/hugo:${HUGO_VERSION}-ubuntu-focal \
             -t truemark/hugo:ubuntu-focal \
             .
   ubuntu-jammy:
@@ -144,7 +149,9 @@ jobs:
             --build-arg OS_VERSION="jammy" \
             --build-arg HUGO_VERSION="${HUGO_VERSION}" \
             -f Dockerfile \
+            -t truemark/hugo:${HUGO_VERSION}-ubuntu-jammy \
             -t truemark/hugo:ubuntu-jammy \
+            -t truemark/hugo:ubuntu \
             .
   debian-buster:
     runs-on: ubuntu-latest
@@ -178,6 +185,7 @@ jobs:
             --build-arg OS_VERSION="buster" \
             --build-arg HUGO_VERSION="${HUGO_VERSION}" \
             -f Dockerfile \
+            -t truemark/hugo:${HUGO_VERSION}-debian-buster \
             -t truemark/hugo:debian-buster \
             .
   debian-bullseye:
@@ -212,6 +220,7 @@ jobs:
             --build-arg OS_VERSION="bullseye" \
             --build-arg HUGO_VERSION="${HUGO_VERSION}" \
             -f Dockerfile \
+            -t truemark/hugo:${HUGO_VERSION}-debian-bullseye \
             -t truemark/hugo:debian-bullseye \
             .
   debian-bookworm:
@@ -246,7 +255,9 @@ jobs:
             --build-arg OS_VERSION="bookworm" \
             --build-arg HUGO_VERSION="${HUGO_VERSION}" \
             -f Dockerfile \
+            -t truemark/hugo:${HUGO_VERSION}-debian-bookworm \
             -t truemark/hugo:debian-bookworm \
+            -t truemark/hugo:debian \
             .
   debian-buster-slim:
     runs-on: ubuntu-latest
@@ -280,6 +291,7 @@ jobs:
             --build-arg OS_VERSION="buster-slim" \
             --build-arg HUGO_VERSION="${HUGO_VERSION}" \
             -f Dockerfile \
+            -t truemark/hugo:${HUGO_VERSION}-debian-buster-slim \
             -t truemark/hugo:debian-buster-slim \
             .
   debian-bullseye-slim:
@@ -314,6 +326,7 @@ jobs:
             --build-arg OS_VERSION="bullseye-slim" \
             --build-arg HUGO_VERSION="${HUGO_VERSION}" \
             -f Dockerfile \
+            -t truemark/hugo:${HUGO_VERSION}-debian-bullseye-slim \
             -t truemark/hugo:debian-bullseye-slim \
             .
   debian-bookworm-slim:
@@ -348,6 +361,7 @@ jobs:
             --build-arg OS_VERSION="bookworm-slim" \
             --build-arg HUGO_VERSION="${HUGO_VERSION}" \
             -f Dockerfile \
+            -t truemark/hugo:${HUGO_VERSION}-debian-bookworm-slim \
             -t truemark/hugo:debian-bookworm-slim \
             .
   amazonlinux-2:
@@ -382,6 +396,7 @@ jobs:
             --build-arg OS_VERSION="2" \
             --build-arg HUGO_VERSION="${HUGO_VERSION}" \
             -f Dockerfile \
+            -t truemark/hugo:${HUGO_VERSION}-amazonlinux-2 \
             -t truemark/hugo:amazonlinux-2 \
             .
   amazonlinux-2022:
@@ -416,5 +431,7 @@ jobs:
             --build-arg OS_VERSION="2022" \
             --build-arg HUGO_VERSION="${HUGO_VERSION}" \
             -f Dockerfile \
+            -t truemark/hugo:${HUGO_VERSION}-amazonlinux-2022 \
             -t truemark/hugo:amazonlinux-2022 \
+            -t truemark/hugo:amazonlinux \
             .
