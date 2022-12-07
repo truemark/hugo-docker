@@ -82,6 +82,8 @@ jobs:
             -t truemark/hugo:alpine \
             -t truemark/hugo:latest \
             .
+      - name: Keepalive
+        uses: gautamkrishnar/keepalive-workflow@v1
   ubuntu-focal:
     runs-on: ubuntu-latest
     steps:
