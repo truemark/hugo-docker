@@ -84,41 +84,41 @@ jobs:
             .
       - name: Keepalive
         uses: gautamkrishnar/keepalive-workflow@v1
-  ubuntu-focal:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-        with:
-          platforms: all
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Get Version
-        id: version
-        run: |
-          export HUGO_VERSION=$(curl -sSL https://api.github.com/repos/gohugoio/hugo/tags | jq -r "[.[].name] | .[0] | sub(\"v\";\"\")")
-          echo "HUGO_VERSION=${HUGO_VERSION}" >> $GITHUB_ENV
-          echo "Version: ${HUGO_VERSION}"
-      - name: Build
-        run: |
-          docker buildx build \
-            --push \
-            --platform linux/arm64,linux/amd64 \
-            --build-arg OS_NAME="ubuntu" \
-            --build-arg OS_VERSION="focal" \
-            --build-arg HUGO_VERSION="${HUGO_VERSION}" \
-            -f Dockerfile \
-            -t truemark/hugo:${HUGO_VERSION}-ubuntu-focal \
-            -t truemark/hugo:ubuntu-focal \
-            .
+#  ubuntu-focal:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#      - name: Login to Docker Hub
+#        uses: docker/login-action@v1
+#        with:
+#          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+#          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+#      - name: Set up QEMU
+#        uses: docker/setup-qemu-action@v2
+#        with:
+#          platforms: all
+#      - name: Set up Docker Buildx
+#        id: buildx
+#        uses: docker/setup-buildx-action@v2
+#      - name: Get Version
+#        id: version
+#        run: |
+#          export HUGO_VERSION=$(curl -sSL https://api.github.com/repos/gohugoio/hugo/tags | jq -r "[.[].name] | .[0] | sub(\"v\";\"\")")
+#          echo "HUGO_VERSION=${HUGO_VERSION}" >> $GITHUB_ENV
+#          echo "Version: ${HUGO_VERSION}"
+#      - name: Build
+#        run: |
+#          docker buildx build \
+#            --push \
+#            --platform linux/arm64,linux/amd64 \
+#            --build-arg OS_NAME="ubuntu" \
+#            --build-arg OS_VERSION="focal" \
+#            --build-arg HUGO_VERSION="${HUGO_VERSION}" \
+#            -f Dockerfile \
+#            -t truemark/hugo:${HUGO_VERSION}-ubuntu-focal \
+#            -t truemark/hugo:ubuntu-focal \
+#            .
   ubuntu-jammy:
     runs-on: ubuntu-latest
     steps:
@@ -155,76 +155,76 @@ jobs:
             -t truemark/hugo:ubuntu-jammy \
             -t truemark/hugo:ubuntu \
             .
-  debian-buster:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-        with:
-          platforms: all
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Get Version
-        id: version
-        run: |
-          export HUGO_VERSION=$(curl -sSL https://api.github.com/repos/gohugoio/hugo/tags | jq -r "[.[].name] | .[0] | sub(\"v\";\"\")")
-          echo "HUGO_VERSION=${HUGO_VERSION}" >> $GITHUB_ENV
-          echo "Version: ${HUGO_VERSION}"
-      - name: Build
-        run: |
-          docker buildx build \
-            --push \
-            --platform linux/arm64,linux/amd64 \
-            --build-arg OS_NAME="debian" \
-            --build-arg OS_VERSION="buster" \
-            --build-arg HUGO_VERSION="${HUGO_VERSION}" \
-            -f Dockerfile \
-            -t truemark/hugo:${HUGO_VERSION}-debian-buster \
-            -t truemark/hugo:debian-buster \
-            .
-  debian-bullseye:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-        with:
-          platforms: all
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Get Version
-        id: version
-        run: |
-          export HUGO_VERSION=$(curl -sSL https://api.github.com/repos/gohugoio/hugo/tags | jq -r "[.[].name] | .[0] | sub(\"v\";\"\")")
-          echo "HUGO_VERSION=${HUGO_VERSION}" >> $GITHUB_ENV
-          echo "Version: ${HUGO_VERSION}"
-      - name: Build
-        run: |
-          docker buildx build \
-            --push \
-            --platform linux/arm64,linux/amd64 \
-            --build-arg OS_NAME="debian" \
-            --build-arg OS_VERSION="bullseye" \
-            --build-arg HUGO_VERSION="${HUGO_VERSION}" \
-            -f Dockerfile \
-            -t truemark/hugo:${HUGO_VERSION}-debian-bullseye \
-            -t truemark/hugo:debian-bullseye \
-            .
+#  debian-buster:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#      - name: Login to Docker Hub
+#        uses: docker/login-action@v1
+#        with:
+#          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+#          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+#      - name: Set up QEMU
+#        uses: docker/setup-qemu-action@v2
+#        with:
+#          platforms: all
+#      - name: Set up Docker Buildx
+#        id: buildx
+#        uses: docker/setup-buildx-action@v2
+#      - name: Get Version
+#        id: version
+#        run: |
+#          export HUGO_VERSION=$(curl -sSL https://api.github.com/repos/gohugoio/hugo/tags | jq -r "[.[].name] | .[0] | sub(\"v\";\"\")")
+#          echo "HUGO_VERSION=${HUGO_VERSION}" >> $GITHUB_ENV
+#          echo "Version: ${HUGO_VERSION}"
+#      - name: Build
+#        run: |
+#          docker buildx build \
+#            --push \
+#            --platform linux/arm64,linux/amd64 \
+#            --build-arg OS_NAME="debian" \
+#            --build-arg OS_VERSION="buster" \
+#            --build-arg HUGO_VERSION="${HUGO_VERSION}" \
+#            -f Dockerfile \
+#            -t truemark/hugo:${HUGO_VERSION}-debian-buster \
+#            -t truemark/hugo:debian-buster \
+#            .
+#  debian-bullseye:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#      - name: Login to Docker Hub
+#        uses: docker/login-action@v1
+#        with:
+#          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+#          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+#      - name: Set up QEMU
+#        uses: docker/setup-qemu-action@v2
+#        with:
+#          platforms: all
+#      - name: Set up Docker Buildx
+#        id: buildx
+#        uses: docker/setup-buildx-action@v2
+#      - name: Get Version
+#        id: version
+#        run: |
+#          export HUGO_VERSION=$(curl -sSL https://api.github.com/repos/gohugoio/hugo/tags | jq -r "[.[].name] | .[0] | sub(\"v\";\"\")")
+#          echo "HUGO_VERSION=${HUGO_VERSION}" >> $GITHUB_ENV
+#          echo "Version: ${HUGO_VERSION}"
+#      - name: Build
+#        run: |
+#          docker buildx build \
+#            --push \
+#            --platform linux/arm64,linux/amd64 \
+#            --build-arg OS_NAME="debian" \
+#            --build-arg OS_VERSION="bullseye" \
+#            --build-arg HUGO_VERSION="${HUGO_VERSION}" \
+#            -f Dockerfile \
+#            -t truemark/hugo:${HUGO_VERSION}-debian-bullseye \
+#            -t truemark/hugo:debian-bullseye \
+#            .
   debian-bookworm:
     runs-on: ubuntu-latest
     steps:
@@ -261,76 +261,76 @@ jobs:
             -t truemark/hugo:debian-bookworm \
             -t truemark/hugo:debian \
             .
-  debian-buster-slim:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-        with:
-          platforms: all
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Get Version
-        id: version
-        run: |
-          export HUGO_VERSION=$(curl -sSL https://api.github.com/repos/gohugoio/hugo/tags | jq -r "[.[].name] | .[0] | sub(\"v\";\"\")")
-          echo "HUGO_VERSION=${HUGO_VERSION}" >> $GITHUB_ENV
-          echo "Version: ${HUGO_VERSION}"
-      - name: Build
-        run: |
-          docker buildx build \
-            --push \
-            --platform linux/arm64,linux/amd64 \
-            --build-arg OS_NAME="debian" \
-            --build-arg OS_VERSION="buster-slim" \
-            --build-arg HUGO_VERSION="${HUGO_VERSION}" \
-            -f Dockerfile \
-            -t truemark/hugo:${HUGO_VERSION}-debian-buster-slim \
-            -t truemark/hugo:debian-buster-slim \
-            .
-  debian-bullseye-slim:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-        with:
-          platforms: all
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Get Version
-        id: version
-        run: |
-          export HUGO_VERSION=$(curl -sSL https://api.github.com/repos/gohugoio/hugo/tags | jq -r "[.[].name] | .[0] | sub(\"v\";\"\")")
-          echo "HUGO_VERSION=${HUGO_VERSION}" >> $GITHUB_ENV
-          echo "Version: ${HUGO_VERSION}"
-      - name: Build
-        run: |
-          docker buildx build \
-            --push \
-            --platform linux/arm64,linux/amd64 \
-            --build-arg OS_NAME="debian" \
-            --build-arg OS_VERSION="bullseye-slim" \
-            --build-arg HUGO_VERSION="${HUGO_VERSION}" \
-            -f Dockerfile \
-            -t truemark/hugo:${HUGO_VERSION}-debian-bullseye-slim \
-            -t truemark/hugo:debian-bullseye-slim \
-            .
+#  debian-buster-slim:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#      - name: Login to Docker Hub
+#        uses: docker/login-action@v1
+#        with:
+#          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+#          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+#      - name: Set up QEMU
+#        uses: docker/setup-qemu-action@v2
+#        with:
+#          platforms: all
+#      - name: Set up Docker Buildx
+#        id: buildx
+#        uses: docker/setup-buildx-action@v2
+#      - name: Get Version
+#        id: version
+#        run: |
+#          export HUGO_VERSION=$(curl -sSL https://api.github.com/repos/gohugoio/hugo/tags | jq -r "[.[].name] | .[0] | sub(\"v\";\"\")")
+#          echo "HUGO_VERSION=${HUGO_VERSION}" >> $GITHUB_ENV
+#          echo "Version: ${HUGO_VERSION}"
+#      - name: Build
+#        run: |
+#          docker buildx build \
+#            --push \
+#            --platform linux/arm64,linux/amd64 \
+#            --build-arg OS_NAME="debian" \
+#            --build-arg OS_VERSION="buster-slim" \
+#            --build-arg HUGO_VERSION="${HUGO_VERSION}" \
+#            -f Dockerfile \
+#            -t truemark/hugo:${HUGO_VERSION}-debian-buster-slim \
+#            -t truemark/hugo:debian-buster-slim \
+#            .
+#  debian-bullseye-slim:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#      - name: Login to Docker Hub
+#        uses: docker/login-action@v1
+#        with:
+#          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+#          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+#      - name: Set up QEMU
+#        uses: docker/setup-qemu-action@v2
+#        with:
+#          platforms: all
+#      - name: Set up Docker Buildx
+#        id: buildx
+#        uses: docker/setup-buildx-action@v2
+#      - name: Get Version
+#        id: version
+#        run: |
+#          export HUGO_VERSION=$(curl -sSL https://api.github.com/repos/gohugoio/hugo/tags | jq -r "[.[].name] | .[0] | sub(\"v\";\"\")")
+#          echo "HUGO_VERSION=${HUGO_VERSION}" >> $GITHUB_ENV
+#          echo "Version: ${HUGO_VERSION}"
+#      - name: Build
+#        run: |
+#          docker buildx build \
+#            --push \
+#            --platform linux/arm64,linux/amd64 \
+#            --build-arg OS_NAME="debian" \
+#            --build-arg OS_VERSION="bullseye-slim" \
+#            --build-arg HUGO_VERSION="${HUGO_VERSION}" \
+#            -f Dockerfile \
+#            -t truemark/hugo:${HUGO_VERSION}-debian-bullseye-slim \
+#            -t truemark/hugo:debian-bullseye-slim \
+#            .
   debian-bookworm-slim:
     runs-on: ubuntu-latest
     steps:
