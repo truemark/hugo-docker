@@ -7,7 +7,7 @@ ARG TARGETARCH
 RUN if [ "${OS_NAME}" = "alpine" ]; then \
       apk add go gcc g++ musl-dev; \
     elif [ "${OS_NAME}" = "debian" ] || [ "${OS_NAME}" = "ubuntu" ]; then \
-      apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -qq golang; \
+      apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -qq curl golang; \
     elif [ "${OS_NAME}" = "amazonlinux" ]; then \
       yum install -y -q go gcc-c++; \
     fi
