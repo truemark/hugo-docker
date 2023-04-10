@@ -9,65 +9,45 @@ on:
     # Run at 4PM UTC every Monday
     - cron: '0 16 * * 1'
 
+permissions:
+  id-token: write
+  contents: write
+
 jobs:
   alpine-316:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-        with:
-          platforms: all
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
       - name: Get Version
         id: version
         run: |
           export HUGO_VERSION=$(curl -sSL https://api.github.com/repos/gohugoio/hugo/tags | jq -r "[.[].name] | .[0] | sub(\"v\";\"\")")
           echo "HUGO_VERSION=${HUGO_VERSION}" >> $GITHUB_ENV
           echo "Version: ${HUGO_VERSION}"
-      - name: Build
-        run: |
-          docker buildx build \
-            --push \
-            --platform linux/arm64,linux/amd64 \
-            --build-arg OS_NAME="alpine" \
-            --build-arg OS_VERSION="3.16" \
-            --build-arg HUGO_VERSION="${HUGO_VERSION}" \
-            -f Dockerfile \
-            -t truemark/hugo:${HUGO_VERSION}-alpine-3.16 \
-            -t truemark/hugo:alpine-3.16 \
-            .
-  alpine-317:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
       - name: Login to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          platforms: all
-      - name: Set up Docker Buildx
+          role-to-assume: "${{ secrets.AWS_ASSUME_ROLE }}"
+          aws-region: "us-east-1"
+      - name: Login to ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          registry-type: public
+      - name: Setup Buildx Remote Docker
         id: buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Get Version
-        id: version
-        run: |
-          export HUGO_VERSION=$(curl -sSL https://api.github.com/repos/gohugoio/hugo/tags | jq -r "[.[].name] | .[0] | sub(\"v\";\"\")")
-          echo "HUGO_VERSION=${HUGO_VERSION}" >> $GITHUB_ENV
-          echo "Version: ${HUGO_VERSION}"
+        uses: truemark/aws-buildx-remote-docker-instance-action@v2
+        with:
+          security-group-id: "${{ vars.SECURITY_GROUP_ID }}"
+          subnet-id: "${{ vars.SUBNET_ID }}"
+          instance-profile: "${{ vars.INSTANCE_PROFILE }}"
+          region: "us-east-2"
       - name: Build
         run: |
           docker buildx build \
@@ -82,68 +62,6 @@ jobs:
             -t truemark/hugo:alpine \
             -t truemark/hugo:latest \
             .
-      - name: Keepalive
-        uses: gautamkrishnar/keepalive-workflow@v1
-#  ubuntu-focal:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v3
-#      - name: Login to Docker Hub
-#        uses: docker/login-action@v1
-#        with:
-#          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-#          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-#      - name: Set up QEMU
-#        uses: docker/setup-qemu-action@v2
-#        with:
-#          platforms: all
-#      - name: Set up Docker Buildx
-#        id: buildx
-#        uses: docker/setup-buildx-action@v2
-#      - name: Get Version
-#        id: version
-#        run: |
-#          export HUGO_VERSION=$(curl -sSL https://api.github.com/repos/gohugoio/hugo/tags | jq -r "[.[].name] | .[0] | sub(\"v\";\"\")")
-#          echo "HUGO_VERSION=${HUGO_VERSION}" >> $GITHUB_ENV
-#          echo "Version: ${HUGO_VERSION}"
-#      - name: Build
-#        run: |
-#          docker buildx build \
-#            --push \
-#            --platform linux/arm64,linux/amd64 \
-#            --build-arg OS_NAME="ubuntu" \
-#            --build-arg OS_VERSION="focal" \
-#            --build-arg HUGO_VERSION="${HUGO_VERSION}" \
-#            -f Dockerfile \
-#            -t truemark/hugo:${HUGO_VERSION}-ubuntu-focal \
-#            -t truemark/hugo:ubuntu-focal \
-#            .
-  ubuntu-jammy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-        with:
-          platforms: all
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Get Version
-        id: version
-        run: |
-          export HUGO_VERSION=$(curl -sSL https://api.github.com/repos/gohugoio/hugo/tags | jq -r "[.[].name] | .[0] | sub(\"v\";\"\")")
-          echo "HUGO_VERSION=${HUGO_VERSION}" >> $GITHUB_ENV
-          echo "Version: ${HUGO_VERSION}"
-      - name: Build
-        run: |
           docker buildx build \
             --push \
             --platform linux/arm64,linux/amd64 \
@@ -155,101 +73,6 @@ jobs:
             -t truemark/hugo:ubuntu-jammy \
             -t truemark/hugo:ubuntu \
             .
-#  debian-buster:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v3
-#      - name: Login to Docker Hub
-#        uses: docker/login-action@v1
-#        with:
-#          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-#          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-#      - name: Set up QEMU
-#        uses: docker/setup-qemu-action@v2
-#        with:
-#          platforms: all
-#      - name: Set up Docker Buildx
-#        id: buildx
-#        uses: docker/setup-buildx-action@v2
-#      - name: Get Version
-#        id: version
-#        run: |
-#          export HUGO_VERSION=$(curl -sSL https://api.github.com/repos/gohugoio/hugo/tags | jq -r "[.[].name] | .[0] | sub(\"v\";\"\")")
-#          echo "HUGO_VERSION=${HUGO_VERSION}" >> $GITHUB_ENV
-#          echo "Version: ${HUGO_VERSION}"
-#      - name: Build
-#        run: |
-#          docker buildx build \
-#            --push \
-#            --platform linux/arm64,linux/amd64 \
-#            --build-arg OS_NAME="debian" \
-#            --build-arg OS_VERSION="buster" \
-#            --build-arg HUGO_VERSION="${HUGO_VERSION}" \
-#            -f Dockerfile \
-#            -t truemark/hugo:${HUGO_VERSION}-debian-buster \
-#            -t truemark/hugo:debian-buster \
-#            .
-#  debian-bullseye:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v3
-#      - name: Login to Docker Hub
-#        uses: docker/login-action@v1
-#        with:
-#          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-#          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-#      - name: Set up QEMU
-#        uses: docker/setup-qemu-action@v2
-#        with:
-#          platforms: all
-#      - name: Set up Docker Buildx
-#        id: buildx
-#        uses: docker/setup-buildx-action@v2
-#      - name: Get Version
-#        id: version
-#        run: |
-#          export HUGO_VERSION=$(curl -sSL https://api.github.com/repos/gohugoio/hugo/tags | jq -r "[.[].name] | .[0] | sub(\"v\";\"\")")
-#          echo "HUGO_VERSION=${HUGO_VERSION}" >> $GITHUB_ENV
-#          echo "Version: ${HUGO_VERSION}"
-#      - name: Build
-#        run: |
-#          docker buildx build \
-#            --push \
-#            --platform linux/arm64,linux/amd64 \
-#            --build-arg OS_NAME="debian" \
-#            --build-arg OS_VERSION="bullseye" \
-#            --build-arg HUGO_VERSION="${HUGO_VERSION}" \
-#            -f Dockerfile \
-#            -t truemark/hugo:${HUGO_VERSION}-debian-bullseye \
-#            -t truemark/hugo:debian-bullseye \
-#            .
-  debian-bookworm:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-        with:
-          platforms: all
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Get Version
-        id: version
-        run: |
-          export HUGO_VERSION=$(curl -sSL https://api.github.com/repos/gohugoio/hugo/tags | jq -r "[.[].name] | .[0] | sub(\"v\";\"\")")
-          echo "HUGO_VERSION=${HUGO_VERSION}" >> $GITHUB_ENV
-          echo "Version: ${HUGO_VERSION}"
-      - name: Build
-        run: |
           docker buildx build \
             --push \
             --platform linux/arm64,linux/amd64 \
@@ -261,101 +84,6 @@ jobs:
             -t truemark/hugo:debian-bookworm \
             -t truemark/hugo:debian \
             .
-#  debian-buster-slim:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v3
-#      - name: Login to Docker Hub
-#        uses: docker/login-action@v1
-#        with:
-#          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-#          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-#      - name: Set up QEMU
-#        uses: docker/setup-qemu-action@v2
-#        with:
-#          platforms: all
-#      - name: Set up Docker Buildx
-#        id: buildx
-#        uses: docker/setup-buildx-action@v2
-#      - name: Get Version
-#        id: version
-#        run: |
-#          export HUGO_VERSION=$(curl -sSL https://api.github.com/repos/gohugoio/hugo/tags | jq -r "[.[].name] | .[0] | sub(\"v\";\"\")")
-#          echo "HUGO_VERSION=${HUGO_VERSION}" >> $GITHUB_ENV
-#          echo "Version: ${HUGO_VERSION}"
-#      - name: Build
-#        run: |
-#          docker buildx build \
-#            --push \
-#            --platform linux/arm64,linux/amd64 \
-#            --build-arg OS_NAME="debian" \
-#            --build-arg OS_VERSION="buster-slim" \
-#            --build-arg HUGO_VERSION="${HUGO_VERSION}" \
-#            -f Dockerfile \
-#            -t truemark/hugo:${HUGO_VERSION}-debian-buster-slim \
-#            -t truemark/hugo:debian-buster-slim \
-#            .
-#  debian-bullseye-slim:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v3
-#      - name: Login to Docker Hub
-#        uses: docker/login-action@v1
-#        with:
-#          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-#          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-#      - name: Set up QEMU
-#        uses: docker/setup-qemu-action@v2
-#        with:
-#          platforms: all
-#      - name: Set up Docker Buildx
-#        id: buildx
-#        uses: docker/setup-buildx-action@v2
-#      - name: Get Version
-#        id: version
-#        run: |
-#          export HUGO_VERSION=$(curl -sSL https://api.github.com/repos/gohugoio/hugo/tags | jq -r "[.[].name] | .[0] | sub(\"v\";\"\")")
-#          echo "HUGO_VERSION=${HUGO_VERSION}" >> $GITHUB_ENV
-#          echo "Version: ${HUGO_VERSION}"
-#      - name: Build
-#        run: |
-#          docker buildx build \
-#            --push \
-#            --platform linux/arm64,linux/amd64 \
-#            --build-arg OS_NAME="debian" \
-#            --build-arg OS_VERSION="bullseye-slim" \
-#            --build-arg HUGO_VERSION="${HUGO_VERSION}" \
-#            -f Dockerfile \
-#            -t truemark/hugo:${HUGO_VERSION}-debian-bullseye-slim \
-#            -t truemark/hugo:debian-bullseye-slim \
-#            .
-  debian-bookworm-slim:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-        with:
-          platforms: all
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Get Version
-        id: version
-        run: |
-          export HUGO_VERSION=$(curl -sSL https://api.github.com/repos/gohugoio/hugo/tags | jq -r "[.[].name] | .[0] | sub(\"v\";\"\")")
-          echo "HUGO_VERSION=${HUGO_VERSION}" >> $GITHUB_ENV
-          echo "Version: ${HUGO_VERSION}"
-      - name: Build
-        run: |
           docker buildx build \
             --push \
             --platform linux/arm64,linux/amd64 \
@@ -366,31 +94,6 @@ jobs:
             -t truemark/hugo:${HUGO_VERSION}-debian-bookworm-slim \
             -t truemark/hugo:debian-bookworm-slim \
             .
-  amazonlinux-2:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-        with:
-          platforms: all
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Get Version
-        id: version
-        run: |
-          export HUGO_VERSION=$(curl -sSL https://api.github.com/repos/gohugoio/hugo/tags | jq -r "[.[].name] | .[0] | sub(\"v\";\"\")")
-          echo "HUGO_VERSION=${HUGO_VERSION}" >> $GITHUB_ENV
-          echo "Version: ${HUGO_VERSION}"
-      - name: Build
-        run: |
           docker buildx build \
             --push \
             --platform linux/arm64,linux/amd64 \
@@ -401,31 +104,6 @@ jobs:
             -t truemark/hugo:${HUGO_VERSION}-amazonlinux-2 \
             -t truemark/hugo:amazonlinux-2 \
             .
-  amazonlinux-2022:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-        with:
-          platforms: all
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Get Version
-        id: version
-        run: |
-          export HUGO_VERSION=$(curl -sSL https://api.github.com/repos/gohugoio/hugo/tags | jq -r "[.[].name] | .[0] | sub(\"v\";\"\")")
-          echo "HUGO_VERSION=${HUGO_VERSION}" >> $GITHUB_ENV
-          echo "Version: ${HUGO_VERSION}"
-      - name: Build
-        run: |
           docker buildx build \
             --push \
             --platform linux/arm64,linux/amd64 \
@@ -437,3 +115,175 @@ jobs:
             -t truemark/hugo:amazonlinux-2022 \
             -t truemark/hugo:amazonlinux \
             .
+      - name: Copy latest to ECR
+        uses: truemark/skopeo-copy-action@v1
+        with:
+          src-image: "docker://truemark/hugo:latest"
+          dest-image: "docker://public.ecr.aws/truemark/hugo:latest"
+          src-username: "${{ secrets.DOCKER_HUB_USERNAME }}"
+          src-password: "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
+          dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"
+          dest-password: "${{ steps.ecr-login.outputs.docker_password_public_ecr_aws }}"
+          multi-arch: "all"
+      - name: Copy alpine to ECR
+        uses: truemark/skopeo-copy-action@v1
+        with:
+          src-image: "docker://truemark/hugo:alpine"
+          dest-image: "docker://public.ecr.aws/truemark/hugo:alpine"
+          src-username: "${{ secrets.DOCKER_HUB_USERNAME }}"
+          src-password: "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
+          dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"
+          dest-password: "${{ steps.ecr-login.outputs.docker_password_public_ecr_aws }}"
+          multi-arch: "all"
+      - name: Copy alpine-3.17 to ECR
+        uses: truemark/skopeo-copy-action@v1
+        with:
+          src-image: "docker://truemark/hugo:alpine-3.17"
+          dest-image: "docker://public.ecr.aws/truemark/hugo:alpine-3.17"
+          src-username: "${{ secrets.DOCKER_HUB_USERNAME }}"
+          src-password: "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
+          dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"
+          dest-password: "${{ steps.ecr-login.outputs.docker_password_public_ecr_aws }}"
+          multi-arch: "all"
+      - name: Copy hugo version alpine to ECR
+        uses: truemark/skopeo-copy-action@v1
+        with:
+          src-image: "docker://truemark/hugo:${HUGO_VERSION}-alpine-3.17"
+          dest-image: "docker://public.ecr.aws/truemark/hugo:${HUGO_VERSION}-alpine-3.17"
+          src-username: "${{ secrets.DOCKER_HUB_USERNAME }}"
+          src-password: "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
+          dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"
+          dest-password: "${{ steps.ecr-login.outputs.docker_password_public_ecr_aws }}"
+          multi-arch: "all"
+      - name: Copy ubuntu to ECR
+        uses: truemark/skopeo-copy-action@v1
+        with:
+          src-image: "docker://truemark/hugo:ubuntu"
+          dest-image: "docker://public.ecr.aws/truemark/hugo:ubuntu"
+          src-username: "${{ secrets.DOCKER_HUB_USERNAME }}"
+          src-password: "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
+          dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"
+          dest-password: "${{ steps.ecr-login.outputs.docker_password_public_ecr_aws }}"
+          multi-arch: "all"
+      - name: Copy ubuntu-jammy to ECR
+        uses: truemark/skopeo-copy-action@v1
+        with:
+          src-image: "docker://truemark/hugo:ubuntu-jammy"
+          dest-image: "docker://public.ecr.aws/truemark/hugo:ubuntu-jammy"
+          src-username: "${{ secrets.DOCKER_HUB_USERNAME }}"
+          src-password: "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
+          dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"
+          dest-password: "${{ steps.ecr-login.outputs.docker_password_public_ecr_aws }}"
+          multi-arch: "all"
+      - name: Copy hugo version ubuntu-jammy to ECR
+        uses: truemark/skopeo-copy-action@v1
+        with:
+          src-image: "docker://truemark/hugo:${HUGO_VERSION}-ubuntu-jammy"
+          dest-image: "docker://public.ecr.aws/truemark/hugo:${HUGO_VERSION}-ubuntu-jammy"
+          src-username: "${{ secrets.DOCKER_HUB_USERNAME }}"
+          src-password: "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
+          dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"
+          dest-password: "${{ steps.ecr-login.outputs.docker_password_public_ecr_aws }}"
+          multi-arch: "all"
+      - name: Copy debian to ECR
+        uses: truemark/skopeo-copy-action@v1
+        with:
+          src-image: "docker://truemark/hugo:debian"
+          dest-image: "docker://public.ecr.aws/truemark/hugo:debian"
+          src-username: "${{ secrets.DOCKER_HUB_USERNAME }}"
+          src-password: "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
+          dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"
+          dest-password: "${{ steps.ecr-login.outputs.docker_password_public_ecr_aws }}"
+          multi-arch: "all"
+      - name: Copy debian-bookworm to ECR
+        uses: truemark/skopeo-copy-action@v1
+        with:
+          src-image: "docker://truemark/hugo:debian-bookworm"
+          dest-image: "docker://public.ecr.aws/truemark/hugo:debian-bookworm"
+          src-username: "${{ secrets.DOCKER_HUB_USERNAME }}"
+          src-password: "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
+          dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"
+          dest-password: "${{ steps.ecr-login.outputs.docker_password_public_ecr_aws }}"
+          multi-arch: "all"
+      - name: Copy hugo version debian-bookworm to ECR
+        uses: truemark/skopeo-copy-action@v1
+        with:
+          src-image: "docker://truemark/hugo:${HUGO_VERSION}-debian-bookworm"
+          dest-image: "docker://public.ecr.aws/truemark/hugo:${HUGO_VERSION}-debian-bookworm"
+          src-username: "${{ secrets.DOCKER_HUB_USERNAME }}"
+          src-password: "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
+          dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"
+          dest-password: "${{ steps.ecr-login.outputs.docker_password_public_ecr_aws }}"
+          multi-arch: "all"
+      - name: Copy debian-bookworm-slim to ECR
+        uses: truemark/skopeo-copy-action@v1
+        with:
+          src-image: "docker://truemark/hugo:debian-bookworm-slim"
+          dest-image: "docker://public.ecr.aws/truemark/hugo:debian-bookworm-slim"
+          src-username: "${{ secrets.DOCKER_HUB_USERNAME }}"
+          src-password: "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
+          dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"
+          dest-password: "${{ steps.ecr-login.outputs.docker_password_public_ecr_aws }}"
+          multi-arch: "all"
+      - name: Copy hugo version debian-bookworm-slim to ECR
+        uses: truemark/skopeo-copy-action@v1
+        with:
+          src-image: "docker://truemark/hugo:${HUGO_VERSION}-debian-bookworm-slim"
+          dest-image: "docker://public.ecr.aws/truemark/hugo:${HUGO_VERSION}-debian-bookworm-slim"
+          src-username: "${{ secrets.DOCKER_HUB_USERNAME }}"
+          src-password: "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
+          dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"
+          dest-password: "${{ steps.ecr-login.outputs.docker_password_public_ecr_aws }}"
+          multi-arch: "all"
+      - name: Copy amazonlinux-2 to ECR
+        uses: truemark/skopeo-copy-action@v1
+        with:
+          src-image: "docker://truemark/hugo:amazonlinux-2"
+          dest-image: "docker://public.ecr.aws/truemark/hugo:amazonlinux-2"
+          src-username: "${{ secrets.DOCKER_HUB_USERNAME }}"
+          src-password: "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
+          dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"
+          dest-password: "${{ steps.ecr-login.outputs.docker_password_public_ecr_aws }}"
+          multi-arch: "all"
+      - name: Copy hugo version amazonlinux-2 to ECR
+        uses: truemark/skopeo-copy-action@v1
+        with:
+          src-image: "docker://truemark/hugo:${HUGO_VERSION}-amazonlinux-2"
+          dest-image: "docker://public.ecr.aws/truemark/hugo:${HUGO_VERSION}-amazonlinux-2"
+          src-username: "${{ secrets.DOCKER_HUB_USERNAME }}"
+          src-password: "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
+          dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"
+          dest-password: "${{ steps.ecr-login.outputs.docker_password_public_ecr_aws }}"
+          multi-arch: "all"
+      - name: Copy amazonlinux to ECR
+        uses: truemark/skopeo-copy-action@v1
+        with:
+          src-image: "docker://truemark/hugo:amazonlinux"
+          dest-image: "docker://public.ecr.aws/truemark/hugo:amazonlinux"
+          src-username: "${{ secrets.DOCKER_HUB_USERNAME }}"
+          src-password: "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
+          dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"
+          dest-password: "${{ steps.ecr-login.outputs.docker_password_public_ecr_aws }}"
+          multi-arch: "all"
+      - name: Copy amazonlinux-2022 to ECR
+        uses: truemark/skopeo-copy-action@v1
+        with:
+          src-image: "docker://truemark/hugo:amazonlinux-2022"
+          dest-image: "docker://public.ecr.aws/truemark/hugo:amazonlinux-2022"
+          src-username: "${{ secrets.DOCKER_HUB_USERNAME }}"
+          src-password: "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
+          dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"
+          dest-password: "${{ steps.ecr-login.outputs.docker_password_public_ecr_aws }}"
+          multi-arch: "all"
+      - name: Copy hugo version amazonlinux-2022 to ECR
+        uses: truemark/skopeo-copy-action@v1
+        with:
+          src-image: "docker://truemark/hugo:${HUGO_VERSION}-amazonlinux-2022"
+          dest-image: "docker://public.ecr.aws/truemark/hugo:${HUGO_VERSION}-amazonlinux-2022"
+          src-username: "${{ secrets.DOCKER_HUB_USERNAME }}"
+          src-password: "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
+          dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"
+          dest-password: "${{ steps.ecr-login.outputs.docker_password_public_ecr_aws }}"
+          multi-arch: "all"
+      - name: Keepalive
+        uses: gautamkrishnar/keepalive-workflow@v1
