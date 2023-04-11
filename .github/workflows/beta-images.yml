@@ -45,7 +45,7 @@ jobs:
           subnet-id: "${{ vars.SUBNET_ID }}"
           instance-profile: "${{ vars.INSTANCE_PROFILE }}"
           region: "us-east-2"
-      - name: Build
+      - name: Build Alpine 3.17
         run: |
           docker buildx build \
             --push \
@@ -56,51 +56,6 @@ jobs:
             -f Dockerfile \
             -t truemark/hugo:beta-alpine-3.17 \
             -t truemark/hugo:beta \
-            .
-          docker buildx build \
-            --push \
-            --platform linux/arm64,linux/amd64 \
-            --build-arg OS_NAME="ubuntu" \
-            --build-arg OS_VERSION="jammy" \
-            --build-arg HUGO_VERSION="${HUGO_VERSION}" \
-            -f Dockerfile \
-            -t truemark/hugo:beta-ubuntu-jammy \
-            .
-          docker buildx build \
-            --push \
-            --platform linux/arm64,linux/amd64 \
-            --build-arg OS_NAME="debian" \
-            --build-arg OS_VERSION="bookworm" \
-            --build-arg HUGO_VERSION="${HUGO_VERSION}" \
-            -f Dockerfile \
-            -t truemark/hugo:beta-debian-bookworm \
-            .
-          docker buildx build \
-            --push \
-            --platform linux/arm64,linux/amd64 \
-            --build-arg OS_NAME="debian" \
-            --build-arg OS_VERSION="bookworm-slim" \
-            --build-arg HUGO_VERSION="${HUGO_VERSION}" \
-            -f Dockerfile \
-            -t truemark/hugo:beta-debian-bookworm-slim \
-            .
-          docker buildx build \
-            --push \
-            --platform linux/arm64,linux/amd64 \
-            --build-arg OS_NAME="amazonlinux" \
-            --build-arg OS_VERSION="2" \
-            --build-arg HUGO_VERSION="${HUGO_VERSION}" \
-            -f Dockerfile \
-            -t truemark/hugo:beta-amazonlinux-2 \
-            .
-          docker buildx build \
-            --push \
-            --platform linux/arm64,linux/amd64 \
-            --build-arg OS_NAME="amazonlinux" \
-            --build-arg OS_VERSION="2022" \
-            --build-arg HUGO_VERSION="${HUGO_VERSION}" \
-            -f Dockerfile \
-            -t truemark/hugo:beta-amazonlinux-2022 \
             .
       - name: Copy beta to ECR
         uses: truemark/skopeo-copy-action@v1
@@ -122,6 +77,17 @@ jobs:
           dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"
           dest-password: "${{ steps.ecr-login.outputs.docker_password_public_ecr_aws }}"
           multi-arch: "all"
+      - name: Build Ubuntu Jammy
+        run: |
+          docker buildx build \
+            --push \
+            --platform linux/arm64,linux/amd64 \
+            --build-arg OS_NAME="ubuntu" \
+            --build-arg OS_VERSION="jammy" \
+            --build-arg HUGO_VERSION="${HUGO_VERSION}" \
+            -f Dockerfile \
+            -t truemark/hugo:beta-ubuntu-jammy \
+            .
       - name: Copy beta-ubuntu-jammy to ECR
         uses: truemark/skopeo-copy-action@v1
         with:
@@ -132,6 +98,17 @@ jobs:
           dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"
           dest-password: "${{ steps.ecr-login.outputs.docker_password_public_ecr_aws }}"
           multi-arch: "all"
+      - name: Build Debian Bookworm
+        run: |
+          docker buildx build \
+            --push \
+            --platform linux/arm64,linux/amd64 \
+            --build-arg OS_NAME="debian" \
+            --build-arg OS_VERSION="bookworm-slim" \
+            --build-arg HUGO_VERSION="${HUGO_VERSION}" \
+            -f Dockerfile \
+            -t truemark/hugo:beta-debian-bookworm \
+            .
       - name: Copy beta-debian-bookworm to ECR
         uses: truemark/skopeo-copy-action@v1
         with:
@@ -142,31 +119,22 @@ jobs:
           dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"
           dest-password: "${{ steps.ecr-login.outputs.docker_password_public_ecr_aws }}"
           multi-arch: "all"
-      - name: Copy beta-debian-bookworm-slim to ECR
+      - name: Build Amazon Linux 2023
+        run: |
+          docker buildx build \
+            --push \
+            --platform linux/arm64,linux/amd64 \
+            --build-arg OS_NAME="amazonlinux" \
+            --build-arg OS_VERSION="2023" \
+            --build-arg HUGO_VERSION="${HUGO_VERSION}" \
+            -f Dockerfile \
+            -t truemark/hugo:beta-amazonlinux-2023 \
+            .
+      - name: Copy beta-amazonlinux-2023 to ECR
         uses: truemark/skopeo-copy-action@v1
         with:
-          src-image: "docker://truemark/hugo:beta-debian-bookworm-slim"
-          dest-image: "docker://public.ecr.aws/truemark/hugo:beta-debian-bookworm-slim"
-          src-username: "${{ secrets.DOCKER_HUB_USERNAME }}"
-          src-password: "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
-          dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"
-          dest-password: "${{ steps.ecr-login.outputs.docker_password_public_ecr_aws }}"
-          multi-arch: "all"
-      - name: Copy beta-amazonlinux-2 to ECR
-        uses: truemark/skopeo-copy-action@v1
-        with:
-          src-image: "docker://truemark/hugo:beta-amazonlinux-2"
-          dest-image: "docker://public.ecr.aws/truemark/hugo:beta-amazonlinux-2"
-          src-username: "${{ secrets.DOCKER_HUB_USERNAME }}"
-          src-password: "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
-          dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"
-          dest-password: "${{ steps.ecr-login.outputs.docker_password_public_ecr_aws }}"
-          multi-arch: "all"
-      - name: Copy beta-amazonlinux-2022 to ECR
-        uses: truemark/skopeo-copy-action@v1
-        with:
-          src-image: "docker://truemark/hugo:beta-amazonlinux-2022"
-          dest-image: "docker://public.ecr.aws/truemark/hugo:beta-amazonlinux-2022"
+          src-image: "docker://truemark/hugo:beta-amazonlinux-2023"
+          dest-image: "docker://public.ecr.aws/truemark/hugo:beta-amazonlinux-2023"
           src-username: "${{ secrets.DOCKER_HUB_USERNAME }}"
           src-password: "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
           dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"
