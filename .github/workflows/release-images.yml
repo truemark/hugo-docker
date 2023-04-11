@@ -200,7 +200,6 @@ jobs:
             -t truemark/hugo:amazonlinux-2023 \
             -t truemark/hugo:amazonlinux \
             .
-
       - name: Copy amazonlinux to ECR
         uses: truemark/skopeo-copy-action@v1
         with:
