@@ -55,9 +55,9 @@ jobs:
             --platform linux/arm64,linux/amd64 \
             --build-arg OS_NAME="alpine" \
             --build-arg OS_VERSION="3.17" \
-            --build-arg HUGO_VERSION="${env.HUGO_VERSION}" \
+            --build-arg HUGO_VERSION="${{ env.HUGO_VERSION }}" \
             -f Dockerfile \
-            -t truemark/hugo:${env.HUGO_VERSION}-alpine-3.17 \
+            -t truemark/hugo:${{ env.HUGO_VERSION }}-alpine-3.17 \
             -t truemark/hugo:alpine-3.17 \
             -t truemark/hugo:alpine \
             -t truemark/hugo:latest \
@@ -95,8 +95,8 @@ jobs:
       - name: Copy hugo version alpine to ECR
         uses: truemark/skopeo-copy-action@v1
         with:
-          src-image: "docker://truemark/hugo:${env.HUGO_VERSION}-alpine-3.17"
-          dest-image: "docker://public.ecr.aws/truemark/hugo:${env.HUGO_VERSION}-alpine-3.17"
+          src-image: "docker://truemark/hugo:${{ env.HUGO_VERSION }}-alpine-3.17"
+          dest-image: "docker://public.ecr.aws/truemark/hugo:${{ env.HUGO_VERSION }}-alpine-3.17"
           src-username: "${{ secrets.DOCKER_HUB_USERNAME }}"
           src-password: "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
           dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"
@@ -109,9 +109,9 @@ jobs:
             --platform linux/arm64,linux/amd64 \
             --build-arg OS_NAME="ubuntu" \
             --build-arg OS_VERSION="jammy" \
-            --build-arg HUGO_VERSION="${env.HUGO_VERSION}" \
+            --build-arg HUGO_VERSION="${{ env.HUGO_VERSION }}" \
             -f Dockerfile \
-            -t truemark/hugo:${env.HUGO_VERSION}-ubuntu-jammy \
+            -t truemark/hugo:${{ env.HUGO_VERSION }}-ubuntu-jammy \
             -t truemark/hugo:ubuntu-jammy \
             -t truemark/hugo:ubuntu \
             .
@@ -138,8 +138,8 @@ jobs:
       - name: Copy hugo version ubuntu-jammy to ECR
         uses: truemark/skopeo-copy-action@v1
         with:
-          src-image: "docker://truemark/hugo:${env.HUGO_VERSION}-ubuntu-jammy"
-          dest-image: "docker://public.ecr.aws/truemark/hugo:${env.HUGO_VERSION}-ubuntu-jammy"
+          src-image: "docker://truemark/hugo:${{ env.HUGO_VERSION }}-ubuntu-jammy"
+          dest-image: "docker://public.ecr.aws/truemark/hugo:${{ env.HUGO_VERSION }}-ubuntu-jammy"
           src-username: "${{ secrets.DOCKER_HUB_USERNAME }}"
           src-password: "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
           dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"
@@ -152,9 +152,9 @@ jobs:
             --platform linux/arm64,linux/amd64 \
             --build-arg OS_NAME="debian" \
             --build-arg OS_VERSION="bookworm-slim" \
-            --build-arg HUGO_VERSION="${env.HUGO_VERSION}" \
+            --build-arg HUGO_VERSION="${{ env.HUGO_VERSION }}" \
             -f Dockerfile \
-            -t truemark/hugo:${env.HUGO_VERSION}-debian-bookworm \
+            -t truemark/hugo:${{ env.HUGO_VERSION }}-debian-bookworm \
             -t truemark/hugo:debian-bookworm \
             .
       - name: Copy debian to ECR
@@ -180,8 +180,8 @@ jobs:
       - name: Copy hugo version debian-bookworm to ECR
         uses: truemark/skopeo-copy-action@v1
         with:
-          src-image: "docker://truemark/hugo:${env.HUGO_VERSION}-debian-bookworm"
-          dest-image: "docker://public.ecr.aws/truemark/hugo:${env.HUGO_VERSION}-debian-bookworm"
+          src-image: "docker://truemark/hugo:${{ env.HUGO_VERSION }}-debian-bookworm"
+          dest-image: "docker://public.ecr.aws/truemark/hugo:${{ env.HUGO_VERSION }}-debian-bookworm"
           src-username: "${{ secrets.DOCKER_HUB_USERNAME }}"
           src-password: "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
           dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"
@@ -194,9 +194,9 @@ jobs:
             --platform linux/arm64,linux/amd64 \
             --build-arg OS_NAME="amazonlinux" \
             --build-arg OS_VERSION="2023" \
-            --build-arg HUGO_VERSION="${env.HUGO_VERSION}" \
+            --build-arg HUGO_VERSION="${{ env.HUGO_VERSION }}" \
             -f Dockerfile \
-            -t truemark/hugo:${env.HUGO_VERSION}-amazonlinux-2023 \
+            -t truemark/hugo:${{ env.HUGO_VERSION }}-amazonlinux-2023 \
             -t truemark/hugo:amazonlinux-2023 \
             -t truemark/hugo:amazonlinux \
             .
@@ -223,8 +223,8 @@ jobs:
       - name: Copy hugo version amazonlinux-2023 to ECR
         uses: truemark/skopeo-copy-action@v1
         with:
-          src-image: "docker://truemark/hugo:${env.HUGO_VERSION}-amazonlinux-2023"
-          dest-image: "docker://public.ecr.aws/truemark/hugo:${env.HUGO_VERSION}-amazonlinux-2023"
+          src-image: "docker://truemark/hugo:${{ env.HUGO_VERSION }}-amazonlinux-2023"
+          dest-image: "docker://public.ecr.aws/truemark/hugo:${{ env.HUGO_VERSION }}-amazonlinux-2023"
           src-username: "${{ secrets.DOCKER_HUB_USERNAME }}"
           src-password: "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}"
           dest-username: "${{ steps.ecr-login.outputs.docker_username_public_ecr_aws }}"

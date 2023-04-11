@@ -52,7 +52,7 @@ jobs:
             --platform linux/arm64,linux/amd64 \
             --build-arg OS_NAME="alpine" \
             --build-arg OS_VERSION="3.17" \
-            --build-arg HUGO_VERSION="${env.HUGO_VERSION}" \
+            --build-arg HUGO_VERSION="${{ env.HUGO_VERSION }}" \
             -f Dockerfile \
             -t truemark/hugo:beta-alpine-3.17 \
             -t truemark/hugo:beta \
@@ -84,7 +84,7 @@ jobs:
             --platform linux/arm64,linux/amd64 \
             --build-arg OS_NAME="ubuntu" \
             --build-arg OS_VERSION="jammy" \
-            --build-arg HUGO_VERSION="${env.HUGO_VERSION}" \
+            --build-arg HUGO_VERSION="${{ env.HUGO_VERSION }}" \
             -f Dockerfile \
             -t truemark/hugo:beta-ubuntu-jammy \
             .
@@ -105,7 +105,7 @@ jobs:
             --platform linux/arm64,linux/amd64 \
             --build-arg OS_NAME="debian" \
             --build-arg OS_VERSION="bookworm-slim" \
-            --build-arg HUGO_VERSION="${env.HUGO_VERSION}" \
+            --build-arg HUGO_VERSION="${{ env.HUGO_VERSION }}" \
             -f Dockerfile \
             -t truemark/hugo:beta-debian-bookworm \
             .
@@ -126,7 +126,7 @@ jobs:
             --platform linux/arm64,linux/amd64 \
             --build-arg OS_NAME="amazonlinux" \
             --build-arg OS_VERSION="2023" \
-            --build-arg HUGO_VERSION="${env.HUGO_VERSION}" \
+            --build-arg HUGO_VERSION="${{ env.HUGO_VERSION }}" \
             -f Dockerfile \
             -t truemark/hugo:beta-amazonlinux-2023 \
             .
