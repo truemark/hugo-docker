@@ -14,7 +14,7 @@ permissions:
   contents: write
 
 jobs:
-  alpine-316:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -156,6 +156,7 @@ jobs:
             -f Dockerfile \
             -t truemark/hugo:${{ env.HUGO_VERSION }}-debian-bookworm \
             -t truemark/hugo:debian-bookworm \
+            -t truemark/hugo:debian \
             .
       - name: Copy debian to ECR
         uses: truemark/skopeo-copy-action@v1
