@@ -6,11 +6,11 @@ ARG HUGO_VERSION
 ARG TARGETARCH
 ARG GO_VERSION
 RUN if [ "${OS_NAME}" = "alpine" ]; then \
-      apk add gcc g++ musl-dev; \
+      apk add gcc g++ musl-dev curl; \
     elif [ "${OS_NAME}" = "debian" ] || [ "${OS_NAME}" = "ubuntu" ]; then \
       apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -qq curl gcc g++; \
     elif [ "${OS_NAME}" = "amazonlinux" ]; then \
-      yum install -y -q gcc-c++; \
+      yum install -y -q gcc-c++ curl; \
     fi
 RUN curl -fsSL -o go$GO_VERSION.$OS_NAME-$TARGETARCH.tar.gz https://go.dev/dl/go${GO_VERSION}.linux-${TARGETARCH}.tar.gz
 RUN tar -C /usr/local -xzf go$GO_VERSION.$OS_NAME-$TARGETARCH.tar.gz
