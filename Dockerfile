@@ -7,9 +7,9 @@ ARG TARGETARCH
 RUN if [ "${OS_NAME}" = "alpine" ]; then \
       apk add go gcc g++ musl-dev; \
     elif [ "${OS_NAME}" = "debian" ]; then \
-      apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -qq golang; \
+      apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -qq golang gcc g++; \
     elif [ "${OS_NAME}" = "ubuntu" ]; then \
-      apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -qq curl; \
+      apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -qq curl gcc g++; \
       curl -fsSL https://go.dev/dl/go1.20.5.linux-${TARGETARCH}.tar.gz | tar -C /usr/local -xz; \
       ln -s /usr/local/go/bin/go /usr/local/bin/go; \
     elif [ "${OS_NAME}" = "amazonlinux" ]; then \
