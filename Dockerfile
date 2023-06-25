@@ -11,7 +11,7 @@ RUN if [ "${OS_NAME}" = "alpine" ]; then \
     elif [ "${OS_NAME}" = "ubuntu" ]; then \
       apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -qq curl; \
       curl -fsSL https://go.dev/dl/go1.20.5.linux-${TARGETARCH}.tar.gz | tar -C /usr/local -xz; \
-      export PATH=${PATH}:/usr/local/go/bin; \
+      ln -s /usr/local/go/bin/go /usr/local/bin/go; \
     elif [ "${OS_NAME}" = "amazonlinux" ]; then \
       yum install -y -q go gcc-c++; \
     fi
